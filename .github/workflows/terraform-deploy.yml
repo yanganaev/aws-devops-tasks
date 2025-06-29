@@ -3,10 +3,10 @@ name: Terraform Deployment
 on:
   push:
     branches:
-      - main  # замените на вашу основную ветку, если это не main
+      - main
   pull_request:
     branches:
-      - task_1
+      - main
 
 jobs:
   terraform-check:
@@ -21,6 +21,7 @@ jobs:
 
       - name: Check Terraform format
         run: terraform fmt -check -recursive
+        working-directory: ./terraform
 
   terraform-plan:
     name: Terraform Plan
@@ -38,13 +39,15 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # замени на свой регион
+          aws-region: us-east-1
 
       - name: Terraform Init
         run: terraform init
+        working-directory: ./terraform
 
       - name: Terraform Plan
         run: terraform plan
+        working-directory: ./terraform
 
   terraform-apply:
     name: Terraform Apply
@@ -63,10 +66,12 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # замени на свой регион
+          aws-region: us-east-1
 
       - name: Terraform Init
         run: terraform init
+        working-directory: ./terraform
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        working-directory: ./terraform
