@@ -15,3 +15,8 @@ variable "environment" {
   type        = string
   default     = "dev"
 }
+
+variable "env_suffix" {
+  description = "Suffix for resource names based on branch"
+  type        = string
+}
