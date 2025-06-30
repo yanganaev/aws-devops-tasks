@@ -5,37 +5,89 @@ on:
     branches: [ task_2 ]
   pull_request:
     branches: [ task_2 ]
+  workflow_dispatch:    # Позволяет запускать вручную из интерфейса GitHub
 
 jobs:
-  terraform:
+  terraform-format-check:
+    name: Terraform Format Check
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: terraform
-
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup Terraform
+      - name: Setup Terraform CLI
         uses: hashicorp/setup-terraform@v3
+      - name: Check Terraform formatting
+        run: terraform fmt -check -recursive
 
-      - name: AWS credentials
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    needs: terraform-format-check
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-
-      - name: Terraform Format
-        run: terraform fmt -check -recursive
-
-      - name: Terraform Init
+      - name: Initialize Terraform
         run: terraform init
-
-      - name: Terraform Plan
+      - name: Run Terraform plan
         run: terraform plan
 
-      - name: Terraform Apply
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/task_')
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    needs: terraform-plan
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/task_')
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Initialize Terraform
+        run: terraform init
+      - name: Apply Terraform changes
         run: terraform apply -auto-approve
+
+  terraform-destroy:
+    name: Terraform Destroy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'  # Запуск вручную
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Initialize Terraform
+        run: terraform init
+      - name: Destroy Terraform-managed infrastructure
+        run: terraform destroy -auto-approve
