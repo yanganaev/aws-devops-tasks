@@ -21,7 +21,7 @@ jobs:
 
       - name: Check Terraform format
         run: terraform fmt -check -recursive
-        working-directory: terraform/${{ github.ref_name }}
+        working-directory: terraform
 
   terraform-plan:
     name: Terraform Plan
@@ -42,15 +42,15 @@ jobs:
           aws-region: us-east-1
 
       - name: List Terraform files
-        run: ls -l terraform/${{ github.ref_name }}
+        run: ls -l terraform
 
       - name: Terraform Init
         run: terraform init
-        working-directory: terraform/${{ github.ref_name }}
+        working-directory: terraform
 
       - name: Terraform Plan
         run: terraform plan -var="env_suffix=${{ github.ref_name }}"
-        working-directory: terraform/${{ github.ref_name }}
+        working-directory: terraform
 
   terraform-apply:
     name: Terraform Apply
@@ -73,8 +73,8 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: terraform/${{ github.ref_name }}
+        working-directory: terraform
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -var="env_suffix=${{ github.ref_name }}"
-        working-directory: terraform/${{ github.ref_name }}
+        working-directory: terraform
