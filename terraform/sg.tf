@@ -1,5 +1,5 @@
-resource "aws_security_group" "bastion_sg" {
-  name        = "bastion-sg-${var.env_suffix}"
+resource "aws_security_group" "bastion" {
+  name        = "${var.project_name}-bastion-sg"
   description = "Allow SSH"
   vpc_id      = aws_vpc.main.id
 
@@ -15,9 +15,5 @@ resource "aws_security_group" "bastion_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "bastion-sg-${var.env_suffix}"
   }
 }
