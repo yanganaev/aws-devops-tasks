@@ -6,7 +6,7 @@ on:
       - task_1
   pull_request:
     branches:
-      - task_1
+      - task_2
 
 jobs:
   terraform-check:
@@ -40,9 +40,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-
-      - name: List Terraform files
-        run: ls -l terraform
 
       - name: Terraform Init
         run: terraform init
