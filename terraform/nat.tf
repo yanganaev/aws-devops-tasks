@@ -1,5 +1,9 @@
 resource "aws_eip" "nat" {
-  domain = "vpc"
+  vpc = true
+
+  tags = {
+    Name = "${var.project_name}-nat-eip"
+  }
 }
 
 resource "aws_nat_gateway" "nat" {
