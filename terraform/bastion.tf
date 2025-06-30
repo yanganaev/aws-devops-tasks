@@ -3,7 +3,7 @@ resource "aws_instance" "bastion" {
   instance_type               = "t2.micro"
   subnet_id                   = aws_subnet.public[0].id
   associate_public_ip_address = true
-  key_name                    = "your-keypair"
+  key_name                    = "my-test-key"
 
   tags = {
     Name = "${var.project_name}-bastion"
