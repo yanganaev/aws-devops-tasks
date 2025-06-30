@@ -3,10 +3,10 @@ name: Terraform Deployment
 on:
   push:
     branches:
-      - task_1
+      - task_*
   pull_request:
     branches:
-      - task_2
+      - task_*
 
 jobs:
   terraform-check:
